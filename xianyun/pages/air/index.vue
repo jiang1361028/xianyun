@@ -1,6 +1,6 @@
 <template>
   <div>
-      首页
+    航空
   </div>
 </template>
 
