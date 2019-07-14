@@ -16,22 +16,27 @@
       </el-row>
       <!-- 登录 -->
       <div class="denglu">
-        <div v-if="false">
-          <nuxt-link>登录 / 注册</nuxt-link>
+        <div v-if="!$store.state.user.userInfo.token">
+          <nuxt-link to="/user/login">登录 / 注册</nuxt-link>
         </div>
-        <div class="img">
-          <nuxt-link to="/">
-            <img src="../assets/pikaqiu.jpg" alt />
-          </nuxt-link>
+        <div class="img" v-else>
+          <!-- 用户头像 -->
           <el-dropdown>
             <span class="el-dropdown-link">
-              奔放的查克拉
-              <i class="el-icon-arrow-down el-icon--right"></i>
+              <!-- 头像 -->
+              <img
+                :src="$axios.defaults.baseURL + $store.state.user.userInfo.user.defaultAvatar"
+                alt
+              />
+              <!-- 昵称 -->
+              {{ $store.state.user.userInfo.user.nickname }}
+              <i
+                class="el-icon-arrow-down el-icon--right"
+              ></i>
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item>个人中心</el-dropdown-item>
-              <el-dropdown-item>退出</el-dropdown-item>
-              
+              <el-dropdown-item @click.native="handleLogout">退出</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -44,6 +49,12 @@
 export default {
   data() {
     return {};
+  },
+  methods: {
+    handleLogout(){
+      this.$store.commit('user/clearUserInfo')
+      this.$message.success('退出成功')
+    }
   }
 };
 </script>
