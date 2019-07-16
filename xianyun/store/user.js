@@ -23,7 +23,7 @@ export const mutations= {
 }
 export const actions= {
     login({ commit},data){
-        this.$axios({
+      return  this.$axios({
             method:'POST',
             url:'/accounts/login',
             data,
