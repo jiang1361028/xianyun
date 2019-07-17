@@ -184,7 +184,7 @@ export default {
       });
       if (valid) {
         this.$router.push({
-          path: "/airs/flights",
+          path: "/air/flights",
           query: this.form
         });
       }
