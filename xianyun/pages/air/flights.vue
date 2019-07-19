@@ -4,8 +4,8 @@
       <!-- 顶部过滤列表 -->
       <div class="flights-content">
         <!-- 过滤条件 -->
-        <div></div>
 
+        <FlightsFilters :data="cacheFlightsData" @cacheFlights="cacheFlights"/>
         <!-- 航班头部布局 -->
         <FlightsListHead />
 
@@ -23,9 +23,7 @@
       </div>
 
       <!-- 侧边栏 -->
-      <div class="aside">
-        <!-- 侧边栏组件 -->
-      </div>
+      <FlightsAside/>
     </el-row>
   </section>
 </template>
@@ -34,32 +32,50 @@
 import moment from "moment";
 import FlightsListHead from "@/components/air/flightsListHead.vue";
 import FlightsItem from "@/components/air/flightsItem.vue";
+import FlightsFilters from "@/components/air/flightsFilters.vue";
+import FlightsAside from "@/components/air/flightsAside.vue";
 export default {
+  watch: {
+    // 监听路由的变化
+    $route() {
+      // 请求机票列表
+      this.getData();
+    }
+  },
   components: {
     FlightsListHead,
-    FlightsItem
+    FlightsItem,
+    FlightsFilters,
+    FlightsAside
+  },
+  computed: {
+    dataList() {
+      return this.flightsData.flights.slice(
+        (this.pageIndex - 1) * this.pageSize,
+        this.pageIndex * this.pageSize
+      );
+    }
   },
   data() {
     return {
-      flightsData: [],
-      dataList: [],
+      flightsData: {
+        flights: [],
+        info: {},
+        options: {}
+      },
+      // 缓存
+      cacheFlightsData: {
+        flights: [],
+        info: {},
+        options: {}
+      },
       pageSize: 5,
       pageIndex: 1,
       total: 0
     };
   },
   mounted() {
-    this.$axios({
-      url: "/airs",
-      params: this.$route.query
-    }).then(res => {
-      console.log(res.data);
-      this.flightsData = res.data;
-      //   总条数
-      this.total = this.flightsData.flights.length;
-      //   this.dataList = this.flightsData.flights;
-      this.setDataList();
-    });
+    this.getData();
   },
   methods: {
     handleSizeChange(val) {
@@ -67,20 +83,39 @@ export default {
       this.pageSize = val;
       // 刷新回到第一页
       this.pageSize = 1;
-      this.setDataList();
+      // this.setDataList();
     },
     handleCurrentChange(val) {
       // console.log(`当前页: ${val}`);
       this.pageIndex = val;
-      this.setDataList();
+      // this.setDataList();
     },
-    // 获取datalist数据
-    setDataList() {
-      this.dataList = this.flightsData.flights.slice(
-        (this.pageIndex - 1) * this.pageSize,
-        this.pageIndex * this.pageSize
-      );
+    getData() {
+      this.pageIndex=1
+      this.$axios({
+        url: "/airs",
+        params: this.$route.query
+      }).then(res => {
+        console.log(res.data);
+        this.flightsData = res.data;
+        // 缓存数据
+        this.cacheFlightsData={...res.data}
+        //   总条数
+        this.total = this.flightsData.flights.length;
+        //   this.dataList = this.flightsData.flights;
+      });
+    },
+    cacheFlights(arr){
+     this.flightsData.flights=arr
+    //  console.log(this.flightsData.flights)
     }
+    // 获取datalist数据
+    // setDataList() {
+    //   this.dataList = this.flightsData.flights.slice(
+    //     (this.pageIndex - 1) * this.pageSize,
+    //     this.pageIndex * this.pageSize
+    //   );
+    // }
   }
 };
 </script>
